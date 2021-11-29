@@ -18,7 +18,7 @@ local function color_from_hue(hue)
 	local x = (1 - math.abs(h % 2 - 1))
 
 	local i = math.floor(h)
-	
+
 	if i == 0 then
 		return {1, x, 0}
 	elseif i == 1 then
@@ -54,7 +54,7 @@ end
 
 function make_color(color, bg)
 	color = cutie.to_color(color)
-	
+
 	return cutie.esc
 		.. (bg and "48" or "38") .. ";2"
 		.. ";" .. math.clamp(math.floor(color[1] * 255), 0, 255)
@@ -108,7 +108,7 @@ end
 
 function cutie.set_canon_input(enabled)
 	local termios = posix.termio.tcgetattr(0)
-	
+
 	if enabled then
 		termios.lflag = bit32.bor(termios.lflag,
 			posix.termio.ICANON,
@@ -118,9 +118,9 @@ function cutie.set_canon_input(enabled)
 		termios.lflag = bit32.band(termios.lflag, bit32.bnot(bit32.bor(
 			posix.termio.ICANON,
 			posix.termio.ECHO
-		)))	
+		)))
 	end
-	
+
 	posix.termio.tcsetattr(0, posix.termio.TCSANOW, termios)
 end
 
@@ -139,10 +139,10 @@ end
 function cutie.poll_input()
 	local pfd = {[0] = {events = {IN = true}}}
 	posix.poll.poll(pfd, 0)
-		
+
 	if pfd[0].revents and pfd[0].revents.IN then
 		local char = getchar()
-	
+
 		if char == "\n" then
 			if input ~= "" then
 				cutie.input:dispatchEvent(Event("input", {input = cutie.input.buffer}))
@@ -152,21 +152,21 @@ function cutie.poll_input()
 			end
 		elseif char == cutie.esc:sub(1, 1) then
 			local char2 = getchar()
-			
+
 			if char2 == cutie.esc:sub(2, 2) then
 				local char3 = getchar()
-				
+
 				if char3 == "A" or char3 == "B" then
 					cutie.input.cursor = (cutie.input.cursor or #cutie.input.history + 1) + (char3 == "A" and -1 or 1)
 
 					if cutie.input.cursor > #cutie.input.history then
 						cutie.input.cursor = #cutie.input.history + 1
 					end
-	
+
 					if cutie.input.cursor < 1 then
 						cutie.input.cursor = 1
 					end
-	
+
 					cutie.input.buffer = cutie.input.history[cutie.input.cursor] or ""
 				end
 			end
@@ -186,7 +186,7 @@ end
 
 function cutie.empty_screen()
 	cutie.move_cursor(1, 1)
-	
+
 	local size = cutie.get_terminal_size()
 	local str = (string.rep(" ", size[1]) .. "\n"):rep(size[2])
 	str = str:sub(1, #str - 1)
