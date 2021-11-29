@@ -225,6 +225,14 @@ function cutie.flush_buffer()
 	cutie.buffer = ""
 end
 
+function cutie.box(size)
+	return {
+		"┌" .. string.rep("─", size[1]) .. "┐", string.rep(
+		"│" .. string.rep(" ", size[1]) .. "│", size[2]),
+		"└" .. string.rep("─", size[1]) .. "┘",
+	}
+end
+
 -- terminal size
 
 function cutie.handle_resize()
